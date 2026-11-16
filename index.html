@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PINJAM YUK KAMPUS — Berbagi & Sewa Barang Mahasiswa UNINDRA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        unindra: {
+                            50: '#F0F9FF',
+                            100: '#E0F2FE',
+                            200: '#BAE6FD',
+                            400: '#38BDF8',
+                            500: '#0EA5E9',
+                            600: '#0284C7',
+                            700: '#0369A1',
+                            800: '#075985',
+                            900: '#0C4A6E',
+                            950: '#082F49',
+                        },
+                        gold: {
+                            50: '#FFFBEB',
+                            100: '#FEF3C7',
+                            300: '#FCD34D',
+                            400: '#FBBF24',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="antialiased pb-20 md:pb-8 selection:bg-unindra-500 selection:text-white">
+
+    <!-- ==================== TOP APP NAVBAR ==================== -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20 gap-3">
+                <!-- Brand Logo -->
+                <button onclick="switchMainTab('katalog')" class="flex items-center gap-2.5 text-left group shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-unindra-500 to-unindra-700 flex items-center justify-center text-white shadow-md shadow-unindra-500/20 group-hover:scale-105 transition-transform">
+                        <i data-lucide="handshake" class="w-5 h-5 text-gold-400"></i>
+                    </div>
+                    <div>
+                        <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-slate-900 block leading-none">
+                            PINJAM YUK <span class="text-unindra-600">KAMPUS</span>
+                        </span>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-slate-500 tracking-wide">UNINDRA Campus Sharing</span>
+                    </div>
+                </button>
+
+                <!-- Search Bar (Desktop & Tablet) -->
+                <div class="hidden md:flex flex-1 max-w-md mx-4">
+                    <div class="relative w-full">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input id="desktopSearchInput" type="text" placeholder="Cari kalkulator, proyektor, kamera, buku..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-100/90 border border-transparent focus:bg-white focus:border-unindra-400 focus:ring-2 focus:ring-unindra-500/20 text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-none">
+                    </div>
+                </div>
+
+                <!-- Right Actions: Pasang Barang & Auth Profile -->
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <button onclick="openAddItemModal()" class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-unindra-600 to-unindra-500 hover:from-unindra-700 hover:to-unindra-600 text-white font-semibold text-xs sm:text-sm shadow-sm shadow-unindra-500/25 transition-all">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span class="hidden xs:inline sm:inline">Pasang Barang</span>
+                    </button>
+
+                    <!-- Dynamic Auth Container (Tombol Masuk KTM atau Lencana Terverifikasi + Logout) -->
+                    <div id="authHeaderContainer" class="flex items-center gap-2">
+                        <!-- Diisi otomatis oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="md:hidden pb-3">
+                <div class="relative w-full">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input id="mobileSearchInput" type="text" placeholder="Cari barang kebutuhan kuliah & organisasi..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-100 border border-transparent focus:bg-white focus:border-unindra-400 text-xs text-slate-800 placeholder:text-slate-400 outline-none">
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Tabs -->
+            <nav class="hidden md:flex items-center gap-6 border-t border-slate-100 pt-1">
+                <button onclick="switchMainTab('katalog')" id="deskTab-katalog" class="main-desk-tab py-3 text-sm font-semibold border-b-2 border-unindra-600 text-unindra-700 flex items-center gap-2 transition-colors">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    Jelajahi Katalog
+                </button>
+                <button onclick="switchMainTab('transaksi')" id="deskTab-transaksi" class="main-desk-tab py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors">
+                    <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                    Transaksi Saya
+                    <span id="deskTxBadge" class="px-2 py-0.5 rounded-full bg-unindra-100 text-unindra-700 font-bold text-[11px]">2</span>
+                </button>
+                <button onclick="switchMainTab('lender')" id="deskTab-lender" class="main-desk-tab py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    Pendapatan & Dompet Lender
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+        <!-- =====================================================================
+             TAB 1: JELAJAHI KATALOG BARANG
+             ===================================================================== -->
+        <section id="view-katalog" class="space-y-8 animate-fade-in">
+            <!-- Hero Banner Ringkas -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-unindra-700 via-unindra-600 to-sky-500 text-white p-6 sm:p-8 shadow-lg shadow-unindra-600/15">
+                <div class="absolute right-0 top-0 w-72 h-72 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                <div class="absolute bottom-0 right-16 w-48 h-48 bg-gold-400/20 rounded-full blur-2xl translate-y-1/2 pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="space-y-2.5 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-white">
+                            <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                            Khusus Mahasiswa Aktif UNINDRA (Kampus A & Kampus B)
+                        </div>
+                        <h1 class="font-display font-extrabold text-2xl sm:text-3xl leading-tight">
+                            Pinjam Gratis atau Sewa Hemat Sesama Mahasiswa!
+                        </h1>
+                        <p class="text-unindra-100 text-xs sm:text-sm leading-relaxed">
+                            Butuh kalkulator ilmiah saat ujian, kamera untuk tugas, atau proyektor rapat UKM? Temukan barang siap pakai di sekitar kampus tanpa perlu beli baru.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
+                        <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-4 py-3 text-left">
+                            <span class="text-[11px] text-unindra-100 block">Peminjaman Sosial</span>
+                            <strong class="font-display font-extrabold text-lg text-emerald-300">Gratis Rp0</strong>
+                        </div>
+                        <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-4 py-3 text-left">
+                            <span class="text-[11px] text-unindra-100 block">Penyewaan Mahasiswa</span>
+                            <strong class="font-display font-extrabold text-lg text-gold-300">Mulai Rp15rb</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Listing: Barang Dipromosikan (Rp5.000) -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-gold-100 text-gold-600 flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </span>
+                        <div>
+                            <h2 class="font-display font-bold text-base sm:text-lg text-slate-900 leading-none">Barang Dipromosikan</h2>
+                            <span class="text-[11px] text-slate-500">Rekomendasi pilihan pemilik barang UNINDRA</span>
+                        </div>
+                    </div>
+                    <button onclick="openAddItemModal(true)" class="text-xs font-semibold text-unindra-600 hover:text-unindra-700 flex items-center gap-1">
+                        <span>Promosikan barangmu</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+
+                <div id="featuredContainer" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Filter Bar Lengkap (Kategori, Tipe Layanan, Lokasi Kampus) -->
+            <div class="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-4">
+                <!-- Row 1: Filter Kategori -->
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <span class="text-xs font-bold text-slate-400 uppercase mr-1 shrink-0">Kategori:</span>
+                    <button onclick="setFilter('category', 'Semua')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-unindra-600 text-white whitespace-nowrap transition-all">Semua</button>
+                    <button onclick="setFilter('category', 'Akademik')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition-all">Akademik</button>
+                    <button onclick="setFilter('category', 'Elektronik')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition-all">Elektronik</button>
+                    <button onclick="setFilter('category', 'Kegiatan Organisasi')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition-all">Kegiatan Organisasi</button>
+                    <button onclick="setFilter('category', 'Kebutuhan Harian')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition-all">Kebutuhan Harian</button>
+                </div>
+
+                <!-- Row 2: Filter Tipe Layanan & Lokasi Kampus -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                    <!-- Tipe Layanan -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold text-slate-400 uppercase mr-1">Layanan:</span>
+                        <button onclick="setFilter('type', 'Semua')" class="type-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white transition-all">Semua</button>
+                        <button onclick="setFilter('type', 'gratis')" class="type-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all">Peminjaman Gratis (Rp0)</button>
+                        <button onclick="setFilter('type', 'berbayar')" class="type-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-all">Penyewaan Berbayar</button>
+                    </div>
+
+                    <!-- Lokasi Kampus -->
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-unindra-600 shrink-0"></i>
+                        <select id="campusFilterSelect" onchange="setFilter('campus', this.value)" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:border-unindra-500">
+                            <option value="Semua">Semua Lokasi Kampus</option>
+                            <option value="Kampus A">Kampus A (Tanjung Barat)</option>
+                            <option value="Kampus B">Kampus B (Gedong)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Katalog Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-display font-bold text-lg text-slate-900">Semua Barang Tersedia</h2>
+                    <span id="catalogCountLabel" class="text-xs font-semibold text-slate-500">Menampilkan 8 barang</span>
+                </div>
+
+                <div id="catalogGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             TAB 2: TRANSAKSI SAYA
+             ===================================================================== -->
+        <section id="view-transaksi" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 rounded-3xl p-6">
+                <div>
+                    <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900">Transaksi Peminjaman & Penyewaan Saya</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                        Pantau status pengajuan, dokumentasi serah terima fisik di kampus, hingga konfirmasi pengembalian barang.
+                    </p>
+                </div>
+                <button onclick="switchMainTab('katalog')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-unindra-50 text-unindra-700 font-semibold text-xs hover:bg-unindra-100 transition-colors shrink-0">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    Cari Barang Lain
+                </button>
+            </div>
+
+            <div id="myTransactionsList" class="space-y-5">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             TAB 3: PENDAPATAN & DOMPET LENDER
+             ===================================================================== -->
+        <section id="view-lender" class="hidden space-y-6 animate-fade-in">
+            <!-- Top Summary Cards -->
+            <div class="grid sm:grid-cols-3 gap-5">
+                <div class="bg-gradient-to-br from-slate-900 to-unindra-950 text-white rounded-3xl p-6 shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-medium text-unindra-200">Saldo Bersih Lender (90%)</span>
+                        <span class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                            <i data-lucide="wallet" class="w-4 h-4 text-gold-400"></i>
+                        </span>
+                    </div>
+                    <p id="lenderNetBalance" class="font-display font-extrabold text-2xl sm:text-3xl text-white">Rp135.000</p>
+                    <p class="text-[11px] text-emerald-400 mt-2 flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        Sudah dipotong komisi platform 10%
+                    </p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-3xl p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold text-slate-500">Kontribusi Komisi Platform (10%)</span>
+                        <span class="w-9 h-9 rounded-xl bg-unindra-50 text-unindra-600 flex items-center justify-center">
+                            <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+                    <p id="lenderPlatformFee" class="font-display font-extrabold text-2xl text-slate-900">Rp15.000</p>
+                    <p class="text-[11px] text-slate-500 mt-2">Mendukung operasional & keamanan sistem kampus</p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-3xl p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold text-slate-500">Barang Saya Terdaftar</span>
+                        <span class="w-9 h-9 rounded-xl bg-amber-50 text-gold-600 flex items-center justify-center">
+                            <i data-lucide="package" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+                    <p id="lenderOwnedCount" class="font-display font-extrabold text-2xl text-slate-900">2 Barang</p>
+                    <button onclick="openAddItemModal()" class="text-xs font-semibold text-unindra-600 hover:underline mt-2 inline-block">
+                        + Tambah barang disewakan/dipinjamkan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid: Daftar Barang Milik Pengguna & Riwayat Ulasan -->
+            <div class="grid lg:grid-cols-12 gap-6">
+                <!-- Daftar Barang Milik Saya -->
+                <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 class="font-display font-bold text-lg text-slate-900">Etalase Barang Milik Saya</h3>
+                            <p class="text-xs text-slate-500">Kelola status ketersediaan dan promosi barang Anda</p>
+                        </div>
+                        <button onclick="openAddItemModal()" class="px-3.5 py-2 rounded-xl bg-unindra-600 text-white text-xs font-semibold hover:bg-unindra-700">
+                            + Pasang Baru
+                        </button>
+                    </div>
+                    <div id="lenderOwnedList" class="space-y-3">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Ulasan Mahasiswa -->
+                <div class="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 space-y-4">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h3 class="font-display font-bold text-lg text-slate-900">Ulasan & Reputasi Kampus</h3>
+                        <p class="text-xs text-slate-500">Penilaian dari sesama mahasiswa UNINDRA</p>
+                    </div>
+
+                    <div id="lenderReviewsList" class="space-y-3">
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs text-slate-900">Naufal Agung P. (TI)</span>
+                                <span class="text-xs font-bold text-gold-500">★★★★★ 5.0</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                "Kamera Canon EOS M50-nya mulus banget, baterai penuh, dan serah terima tepat waktu di Perpustakaan Kampus A. Sangat membantu tugas dokumentasi!"
+                            </p>
+                            <span class="text-[10px] text-slate-400 block">2 hari yang lalu</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs text-slate-900">Adit Wijaya (TI)</span>
+                                <span class="text-xs font-bold text-gold-500">★★★★★ 5.0</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                "Terima kasih sudah meminjamkan kalkulator ilmiah saat ujian Kalkulus. Kondisinya bersih dan lengkap."
+                            </p>
+                            <span class="text-[10px] text-slate-400 block">5 hari yang lalu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== MOBILE BOTTOM NAVIGATION ==================== -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 px-2 py-2 flex items-center justify-around shadow-lg">
+        <button onclick="switchMainTab('katalog')" id="mobTab-katalog" class="main-mob-tab flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-unindra-600 font-bold text-[11px]">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <span>Katalog</span>
+        </button>
+        <button onclick="switchMainTab('transaksi')" id="mobTab-transaksi" class="main-mob-tab flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-slate-400 font-medium text-[11px] relative">
+            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+            <span>Transaksi</span>
+            <span id="mobTxBadge" class="absolute top-0.5 right-3 px-1.5 py-0.2 rounded-full bg-unindra-600 text-white font-bold text-[9px]">2</span>
+        </button>
+        <button onclick="switchMainTab('lender')" id="mobTab-lender" class="main-mob-tab flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-slate-400 font-medium text-[11px]">
+            <i data-lucide="wallet" class="w-5 h-5"></i>
+            <span>Dompet Lender</span>
+        </button>
+    </nav>
+
+    <!-- =====================================================================
+         MODAL 1: DETAIL BARANG & PENGAJUAN PEMINJAMAN / PENYEWAAN
+         ===================================================================== -->
+    <div id="detailModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-200 my-auto animate-fade-in">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span id="detCatBadge" class="px-2.5 py-1 rounded-lg bg-unindra-100 text-unindra-700 font-bold text-xs">Kategori</span>
+                    <span id="detTypeBadge" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">Gratis</span>
+                </div>
+                <button onclick="closeDetailModal()" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
+                <!-- Item Info Header -->
+                <div class="flex flex-col sm:flex-row gap-4 items-start">
+                    <div id="detIconBox" class="w-20 h-20 rounded-2xl bg-unindra-100 text-unindra-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="package" class="w-10 h-10"></i>
+                    </div>
+                    <div class="space-y-1.5 flex-1">
+                        <h3 id="detTitle" class="font-display font-extrabold text-xl text-slate-900">Nama Barang</h3>
+                        <p id="detCondition" class="text-xs text-slate-600 leading-relaxed">Deskripsi kondisi fisik barang.</p>
+                        <div class="flex flex-wrap items-center gap-3 pt-1 text-xs">
+                            <span class="inline-flex items-center gap-1 font-semibold text-slate-800">
+                                <i data-lucide="badge-check" class="w-4 h-4 text-unindra-600"></i>
+                                <span id="detOwner">Pemilik Barang</span>
+                            </span>
+                            <span class="text-gold-600 font-bold" id="detRating">★ 4.9</span>
+                            <span class="text-slate-500" id="detLocation">• Kampus B</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Pengajuan -->
+                <div class="grid sm:grid-cols-3 gap-3.5 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal Mulai</label>
+                        <input id="detStartDate" type="date" value="2026-11-18" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-unindra-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Durasi (Hari)</label>
+                        <select id="detDuration" onchange="updateDetailPricing()" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:border-unindra-500">
+                            <option value="1">1 Hari</option>
+                            <option value="2">2 Hari</option>
+                            <option value="3">3 Hari</option>
+                            <option value="5">5 Hari</option>
+                            <option value="7">7 Hari (1 Minggu)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Titik Serah Terima (COD)</label>
+                        <select id="detCodPoint" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-unindra-500">
+                            <option value="Perpustakaan Kampus A (Tanjung Barat)">Perpustakaan Kampus A</option>
+                            <option value="Lobi Gedung Utama Kampus A">Lobi Utama Kampus A</option>
+                            <option value="Kantin Utama Kampus B (Gedong)">Kantin Utama Kampus B</option>
+                            <option value="Sekretariat UKM / Lobi Gedung 3 Kampus B">Lobi Gedung 3 Kampus B</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Catatan untuk Pemilik Barang</label>
+                    <input id="detNotes" type="text" placeholder="Contoh: Dipakai untuk presentasi mata kuliah jam 10.00 WIB..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-unindra-500">
+                </div>
+
+                <!-- Rincian Total Biaya -->
+                <div id="detPricingBox" class="rounded-2xl p-4 bg-unindra-50 border border-unindra-200 space-y-2 text-xs">
+                    <!-- Populated via JS -->
+                </div>
+
+                <!-- Aturan & Komitmen Keamanan -->
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 flex items-start gap-3 text-[11px] text-slate-600">
+                    <i data-lucide="camera" class="w-4 h-4 text-unindra-600 shrink-0 mt-0.5"></i>
+                    <span>
+                        <strong>Standar Keamanan Kampus:</strong> Kedua pihak wajib mendokumentasikan foto kondisi fisik barang saat serah terima dan pengembalian demi mencegah perselisihan.
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button onclick="closeDetailModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+                        Batal
+                    </button>
+                    <button onclick="confirmBooking()" class="px-6 py-2.5 rounded-xl bg-unindra-600 hover:bg-unindra-700 text-white text-xs font-bold shadow-md shadow-unindra-500/20 transition-all">
+                        Ajukan Peminjaman / Sewa Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 2: + PASANG BARANG BARU (LENDER)
+         ===================================================================== -->
+    <div id="addItemModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 my-auto animate-fade-in">
+            <div class="px-6 py-4 bg-gradient-to-r from-unindra-600 to-unindra-500 text-white flex items-center justify-between">
+                <div>
+                    <h3 class="font-display font-bold text-lg">Pasang Barang ke Katalog</h3>
+                    <p class="text-[11px] text-unindra-100">Bagikan secara gratis atau sewakan untuk penghasilan tambahan</p>
+                </div>
+                <button onclick="closeAddItemModal()" class="p-2 rounded-xl bg-white/15 text-white hover:bg-white/25">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form id="addItemForm" onsubmit="handleAddItemSubmit(event)" class="p-6 space-y-4 max-h-[82vh] overflow-y-auto text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Barang *</label>
+                    <input id="newItemName" type="text" required placeholder="Contoh: Kalkulator Ilmiah Casio / Tripod Kamera" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-unindra-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Kategori Barang *</label>
+                        <select id="newItemCat" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-800 focus:outline-none focus:border-unindra-500">
+                            <option value="Akademik">Akademik</option>
+                            <option value="Elektronik">Elektronik</option>
+                            <option value="Kegiatan Organisasi">Kegiatan Organisasi</option>
+                            <option value="Kebutuhan Harian">Kebutuhan Harian</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Lokasi Kampus *</label>
+                        <select id="newItemCampus" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-800 focus:outline-none focus:border-unindra-500">
+                            <option value="Kampus A">Kampus A (Tanjung Barat)</option>
+                            <option value="Kampus B">Kampus B (Gedong)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Jenis Layanan -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Jenis Layanan *</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer border border-emerald-200 bg-emerald-50/60 rounded-xl p-3 flex items-center gap-2.5">
+                            <input type="radio" name="serviceType" value="gratis" onchange="toggleNewItemPrice()" class="accent-emerald-600">
+                            <div>
+                                <span class="font-bold text-emerald-800 block">Peminjaman Gratis</span>
+                                <span class="text-[10px] text-emerald-700">Rp0 • Solidaritas kampus</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer border border-amber-200 bg-amber-50/60 rounded-xl p-3 flex items-center gap-2.5">
+                            <input type="radio" name="serviceType" value="berbayar" checked onchange="toggleNewItemPrice()" class="accent-amber-600">
+                            <div>
+                                <span class="font-bold text-amber-900 block">Sewa Berbayar</span>
+                                <span class="text-[10px] text-amber-800">Anda terima 90% tarif</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Input Tarif Sewa -->
+                <div id="newItemPriceGroup">
+                    <label class="block font-bold text-slate-700 mb-1">Tarif Sewa per Hari (Rp) *</label>
+                    <input id="newItemPrice" type="number" min="5000" step="5000" value="25000" oninput="previewLenderCut()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-900 focus:outline-none focus:border-unindra-500">
+                    <p id="lenderCutPreview" class="text-[11px] text-unindra-700 mt-1 font-medium">
+                        Estimasi bersih untuk Anda (90%): <strong>Rp22.500</strong> / hari (Komisi platform 10%: Rp2.500)
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Deskripsi Kondisi & Kelengkapan *</label>
+                    <textarea id="newItemDesc" rows="2" required placeholder="Contoh: Kondisi 95% mulus, lengkap dengan tas dan kabel charger." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-unindra-500"></textarea>
+                </div>
+
+                <!-- Opsi Promosi Rp5.000 -->
+                <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-gold-50 border border-gold-400/50 cursor-pointer">
+                    <input id="newItemFeatured" type="checkbox" class="mt-0.5 accent-amber-600 w-4 h-4">
+                    <div>
+                        <span class="font-bold text-amber-900 flex items-center gap-1.5">
+                            Promosikan Barang di Beranda (+Rp5.000)
+                            <span class="px-1.5 py-0.5 rounded bg-gold-500 text-white text-[9px] uppercase">Featured</span>
+                        </span>
+                        <span class="text-[11px] text-amber-800 block mt-0.5">
+                            Tampilkan barang Anda di bagian atas halaman utama agar lebih cepat ditemukan mahasiswa lain.
+                        </span>
+                    </div>
+                </label>
+
+                <div class="flex justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="closeAddItemModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-unindra-600 hover:bg-unindra-700 text-white font-bold shadow-md">Publikasikan Barang</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 3: BERI ULASAN & RATING SETELAH PENGEMBALIAN
+         ===================================================================== -->
+    <div id="reviewModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-lg text-slate-900">Beri Penilaian Layanan</h3>
+                <button onclick="closeReviewModal()" class="p-1.5 rounded-xl bg-slate-100 text-slate-500">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <p id="reviewItemSubtitle" class="text-xs text-slate-500">Bagaimana pengalaman Anda meminjam barang ini?</p>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Pilih Rating Bintang</label>
+                <select id="reviewStarsInput" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-gold-600">
+                    <option value="5.0">★★★★★ (5.0 - Sangat Memuaskan)</option>
+                    <option value="4.8">★★★★★ (4.8 - Baik & Tepat Waktu)</option>
+                    <option value="4.5">★★★★☆ (4.5 - Cukup Baik)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Ulasan Singkat</label>
+                <textarea id="reviewTextInput" rows="3" placeholder="Tulis pengalaman serah terima dan kondisi barang..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-unindra-500"></textarea>
+            </div>
+
+            <button onclick="submitReview()" class="w-full py-3 rounded-xl bg-unindra-600 hover:bg-unindra-700 text-white font-bold text-xs shadow-md">
+                Kirim Ulasan & Selesaikan Transaksi
+            </button>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 4: LOGIN MAHASISWA UNINDRA (SIMPEL KTM)
+         ===================================================================== -->
+    <div id="loginModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 animate-fade-in">
+            <!-- Header Modal -->
+            <div class="px-6 py-5 bg-gradient-to-r from-unindra-700 to-unindra-500 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-gold-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-base leading-tight">Masuk Akun Mahasiswa</h3>
+                        <p class="text-[11px] text-unindra-100">Verifikasi KTM UNINDRA untuk mulai meminjam</p>
+                    </div>
+                </div>
+                <button onclick="closeLoginModal()" class="p-1.5 rounded-xl bg-white/15 text-white hover:bg-white/25">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Form Login -->
+            <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">NPM Mahasiswa UNINDRA *</label>
+                    <input id="loginNpmInput" type="text" required pattern="[0-9]{12}" maxlength="12" placeholder="Contoh: 202443501146 (12 digit angka)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-slate-800 focus:outline-none focus:border-unindra-500">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+                    <input id="loginNameInput" type="text" required placeholder="Sesuai KTM (Contoh: Mundzir T. Tsaqif)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-unindra-500">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Program Studi *</label>
+                    <select id="loginProdiInput" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-800 focus:outline-none focus:border-unindra-500">
+                        <option value="Teknik Informatika">Teknik Informatika</option>
+                        <option value="Sistem Informasi">Sistem Informasi</option>
+                        <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                        <option value="Pendidikan Bahasa Inggris">Pendidikan Bahasa Inggris</option>
+                        <option value="Manajemen">Manajemen</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Kata Sandi *</label>
+                    <input id="loginPassInput" type="password" required minlength="4" placeholder="Masukkan kata sandi (min. 4 karakter)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-unindra-500">
+                </div>
+
+                <!-- Tombol Cepat Demo -->
+                <div class="p-3 rounded-2xl bg-unindra-50 border border-unindra-200 flex items-center justify-between">
+                    <span class="text-[11px] text-unindra-800">Ingin langsung coba tanpa ketik?</span>
+                    <button type="button" onclick="fillDemoAccount()" class="px-2.5 py-1 rounded-lg bg-unindra-600 text-white font-bold text-[11px] hover:bg-unindra-700 transition-colors">
+                        Isi Akun Demo
+                    </button>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-unindra-600 hover:bg-unindra-700 text-white font-bold text-xs shadow-md transition-all">
+                    Masuk Sekarang
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastBox" class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-4 py-3.5 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-3 text-xs sm:text-sm max-w-sm">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+            <span id="toastText">Berhasil!</span>
+        </div>
+    </div>
+
+   <script src="script.js"></script>
+
+</body>
+</html>
